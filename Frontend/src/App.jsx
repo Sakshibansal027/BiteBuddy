@@ -1,0 +1,52 @@
+import { Route, Routes } from "react-router-dom";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import Home from "./pages/Home"
+import ForgotPassword from "./pages/ForgotPassword";
+import useGetCurrentUser from "./hooks/useGetCurrentUser";
+import AddItem from "./pages/AddItem"
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import useGetCity from "./hooks/useGetCity";
+import useGetMyShop from "./hooks/useGetMyShop";
+import CreateEditShop from "./pages/CreateEditShop";
+import EditItem from "./pages/EditItem";
+import useGetShopByCity from "./hooks/useGetShopByCity";
+import useGetItemsByCity from "./hooks/useGetItemsByCity";
+import CartPage from "./pages/CartPage";
+import Checkout from "./pages/Checkout";
+import OrderPlaced from "./pages/OrderPlaced";
+import MyOrders from "./pages/MyOrders";
+import useGetMyOrders from "./hooks/useGetMyOrder";
+
+function App() {
+  useGetCurrentUser();
+  useGetCity();
+  useGetMyShop();
+  useGetShopByCity();
+  useGetItemsByCity();
+  useGetMyOrders();
+  const { userData, loading } = useSelector(state => state.user);
+  const { ownerData } = useSelector(state => state.owner);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+console.log(userData, loading)
+  return (
+    <Routes>
+      <Route path="/" element={userData ? <Home /> : <Navigate to={"/signin"} />} />
+      <Route path="/signup" element={!userData ? <SignUp /> : <Navigate to={"/"} />} />
+      <Route path="/signin" element={!userData ? <SignIn /> : <Navigate to={"/"} />} />
+      <Route path="/forgot-password" element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />} />
+      <Route path="/create-edit-shop" element={!ownerData ? <CreateEditShop /> : <Navigate to={"/signin"} />} />
+      <Route path="/add-item" element ={userData ? <AddItem/>:<Navigate to={"/signin"}/>}/>
+      <Route path="/edit-item/:itemId" element ={userData ? <EditItem/>:<Navigate to={"/signin"}/>}/>
+      <Route path="/cart" element ={userData ? <CartPage/>:<Navigate to={"/signin"}/>}/>
+      <Route path="/checkout" element ={userData ? <Checkout />:<Navigate to={"/signin"}/>}/>
+      <Route path="/order-placed" element ={userData ? <OrderPlaced />:<Navigate to={"/signin"}/>}/>
+            <Route path="/my-orders" element ={userData ? <MyOrders />:<Navigate to={"/signin"}/>}/>
+    </Routes>
+  );
+}
+export default App;
