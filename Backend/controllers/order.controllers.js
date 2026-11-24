@@ -1,18 +1,26 @@
 import Order from "../models/order.model.js";
 import Shop from "../models/shop.model.js";
+import Item from "../models/item.model.js";
 export const placeOrder = async (req, res) => {
   try {
     const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body;
-    console.log("Cart Items:", items);
+
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ message: "cart is empty" });
     }
     if (
-      !deliveryAddress.text ||
-      !deliveryAddress.latitude ||
-      !deliveryAddress.longitude
+      !deliveryAddress?.text ||
+      !deliveryAddress?.latitude ||
+      !deliveryAddress?.longitude
     ) {
       return res.status(400).json({ message: "send complete deliveryAddress" });
+    }
+    const dbItems = await Item.find({
+      _id: { $in: cartItems.map((i) => i._id) },
+    });
+    const itemMap = new Map(dbItems.map((i) => [i._id.toString(), i]));
+    if (cartItems.some((i) => !itemMap.has(String(i._id)))) {
+      return res.status(400).json({ message: "item not found" });
     }
     const groupItemsByShop = {};
     cartItems.forEach((item) => {
@@ -33,21 +41,23 @@ export const placeOrder = async (req, res) => {
         const items = groupItemsByShop[shopId]; // ✅ yahin use karo
 
         const subtotal = items.reduce((sum, i) => {
-          const price = Number(i.price) || 0;
-          const quantity = Number(i.quantity) || 0;
-          return sum + price * quantity;
+          const dbItem = itemMap.get(String(i._id));
+          return sum + dbItem.price * (Number(i.quantity) || 0);
         }, 0);
 
         return {
           shop: shop._id,
           owner: shop.owner._id,
           subtotal,
-          shopOrderItems: items.map((i) => ({
-            item: i.id,
-            price: Number(i.price) || 0,
-            quantity: Number(i.quantity) || 0,
-            name: i.name,
-          })),
+          shopOrderItems: items.map((i) => {
+            const dbItem = itemMap.get(String(i._id));
+            return {
+              item: dbItem._id,
+              name: dbItem.name,
+              price: dbItem.price,
+              quantity: Number(i.quantity) || 0,
+            };
+          }),
         };
       }),
     );
@@ -68,24 +78,25 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-export const getMyOrders = async (req,res) => {
+export const getMyOrders = async (req, res) => {
   try {
-    const user = await UserActivation.findById(req.userId);
+    const user = req.user;
     if (user.role == "user") {
-      const orders = await Order.find({ user: req.user })
+      const orders = await Order.find({ user: user._id })
         .sort({ createdAt: -1 })
         .populate("shopOrders.shop", "name")
-        .populate("shopOrders.owner", "name")
+        .populate("shopOrders.owner", "fullname")
         .populate("shopOrders.shopOrderItems.item", "name image price");
       return res.status(200).json(orders);
     } else if (user.role == "owner") {
-      const orders = await Order.find({ "shopOrders.owner": req.user })
+      const orders = await Order.find({ "shopOrders.owner": req.user._id })
         .sort({ createdAt: -1 })
         .populate("shopOrders.shop", "name")
-        .populate("user")
+        .populate("user", "fullname email mobile")
         .populate("shopOrders.shopOrderItems.item", "name image price");
       return res.status(200).json(orders);
     }
+    return res.status(200).json([]);
   } catch (error) {
     return res.status(500).json({ message: `get user order error ${error}` });
   }

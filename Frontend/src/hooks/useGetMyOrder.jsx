@@ -17,7 +17,7 @@ function useGetMyOrders() {
                     withCredentials: true
                 });
                 console.log(res.data)
-                dispsatch(setMyOrders(res.data));
+                dispatch(setMyOrders(res.data));
             } catch (error) {
                 dispatch(setMyOrders(null));
             } finally {

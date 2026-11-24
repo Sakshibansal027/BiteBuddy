@@ -6,7 +6,9 @@ export const getCurrentUser = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await User.findById(req.userId);
+      const user = await User.findById(req.userId).select(
+      "-password -resetOtp -otpExpires -isOtpVerified",
+    );
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

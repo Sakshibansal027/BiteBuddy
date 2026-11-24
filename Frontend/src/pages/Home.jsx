@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import DeliverBoy from '../components/deliverBoy'
+import DeliverBoy from '../components/DeliverBoy'
 import OwnerDashboard from '../components/OwnerDashboard'
 import UserDashboard from '../components/UserDashboard'
 

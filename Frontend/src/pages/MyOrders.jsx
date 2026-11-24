@@ -5,7 +5,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import UserOrderCard from '../components/UserOrderCard';
 import OwnerOrderCard from '../components/OwnerOrderCard';
 function MyOrders() {
-  const { userData, myorders } = useSelector(state => state.user)
+  const { userData, myOrders } = useSelector(state => state.user)
   const navigate = useNavigate();
 
   return (
@@ -18,7 +18,7 @@ function MyOrders() {
           <h1 className="text-2xl font-semibold text-start">My Orders</h1>
         </div>
         <div className='space-y-6'>
-          {myorders?.map((order, index) => (
+          {myOrders?.map((order, index) => (
             userData.role == "user" ? (
               <UserOrderCard data={order} key={index} />
             )

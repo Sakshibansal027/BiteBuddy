@@ -2,6 +2,12 @@ import { sendOTPMail } from "../utils/mail.js";
 import genToken from "../utils/token.js";
 import User from "./../models/user.model.js";
 import bcrypt from "bcryptjs";
+const safeUser = (user) => {
+  const { password, resetOtp, otpExpires, isOtpVerified, ...rest } =
+    user.toObject();
+  return rest;
+};
+
 export const signUp = async (req, res) => {
   try {
     const { fullname, email, password, mobile, role } = req.body;
@@ -34,9 +40,8 @@ export const signUp = async (req, res) => {
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-
     });
-    return res.status(201).json(user);
+    return res.status(201).json(safeUser(user));
   } catch (error) {
     console.error("SIGNUP ERROR:", error);
     return res.status(500).json({ message: `sign up error ${error.message}` });
@@ -48,6 +53,11 @@ export const signIn = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User doesn't exist" });
+    }
+    if (!user.password) {
+      return res
+        .status(400)
+        .json({ message: "This account uses Google sign in" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -61,7 +71,7 @@ export const signIn = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    return res.status(200).json(user);
+    return res.status(200).json(safeUser(user));
   } catch (error) {
     return res.status(500).json(`sign in error ${error}`);
   }
@@ -105,7 +115,6 @@ export const verifyOtp = async (req, res) => {
     user.otpExpires = undefined;
     await user.save();
     return res.status(200).json({ message: "otp verify successfully" });
-
   } catch (error) {
     return res.status(500).json(`verify otp error ${error}`);
   }
@@ -130,26 +139,32 @@ export const resetPassword = async (req, res) => {
 };
 export const googleAuth = async (req, res) => {
   try {
-    const { fullname, email, mobile,role } = req.body;
+    const { fullname, email, mobile, role } = req.body;
     let user = await User.findOne({ email });
     if (!user) {
+      if (!mobile || !role || !fullname) {
+        return res
+          .status(400)
+          .json({ message: "Account not found. Please sign up first." });
+      }
       user = await User.create({
         fullname,
         email,
         mobile,
-        role
+        role,
+        authProvider: "google",
       });
     }
     const token = await genToken(user._id);
     res.cookie("token", token, {
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    return res.status(200).json(user);
-  }catch (error) {
-  console.log("GOOGLE AUTH ERROR:", error);
-  return res.status(500).json({ message: error.message });
-}
+    return res.status(200).json(safeUser(user));
+  } catch (error) {
+    console.log("GOOGLE AUTH ERROR:", error);
+    return res.status(500).json({ message: error.message });
+  }
 };

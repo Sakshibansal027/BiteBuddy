@@ -7,9 +7,9 @@ function OrderPlaced() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      
+
       <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
-        
+
         {/* Success Icon */}
         <FaCheckCircle className="text-green-500 text-6xl mx-auto mb-4" />
 
@@ -36,17 +36,17 @@ function OrderPlaced() {
         {/* Buttons */}
         <div className="flex gap-3">
           <button
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate("/my-orders")}
             className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg transition"
           >
             Track Order
           </button>
 
           <button
-            onClick={() => navigate("my-orders")}
+            onClick={() => navigate("/")}
             className="flex-1 border border-gray-300 hover:bg-gray-100 py-2 rounded-lg transition"
           >
-           Back to my orders
+            Back to home
           </button>
         </div>
       </div>
