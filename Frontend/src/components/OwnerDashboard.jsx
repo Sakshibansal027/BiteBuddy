@@ -39,7 +39,7 @@ function OwnerDashboard() {
         )}
 
         {myShopData && (
-          <div className="w-full flex flex-col items-center px-4 sm:px-6 mt-20 ">
+          <div className="w-full flex flex-col items-center px-4 sm:px-6 mt-20 mb-5">
             {/* Card */}
             <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl overflow-hidden border border-orange-100 relative">
               <div

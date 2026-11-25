@@ -54,7 +54,7 @@ export const editItem = async (req, res) => {
       const image = await uploadOnCloudinary(req.file.path);
       if (image) updateData.image = image;
     }
-    await Item.findByIdAndUpdate(itemId, updateData, { new: true });
+    await Item.findByIdAndUpdate(itemId, updateData, { returnDocument: "after" });
 
     await shop.populate({
       path: "items",

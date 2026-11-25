@@ -1,4 +1,3 @@
-import React from "react";
 
 function ShopCard({ shop }) {
   return (

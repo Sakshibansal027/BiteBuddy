@@ -10,6 +10,10 @@ export const createEditShop = async (req, res) => {
     let image;
     if (req.file) {
       image = await uploadOnCloudinary(req.file.path);
+      // Upload fail hua (jaise galat Cloudinary key) to saaf message do
+      if (!image) {
+        return res.status(500).json({ message: "Image upload failed" });
+      }
     }
     let shop = await Shop.findOne({ owner: req.userId });
     if (!shop) {
@@ -35,7 +39,9 @@ export const createEditShop = async (req, res) => {
       if (image) {
         updateData.image = image;
       }
-      shop = await Shop.findByIdAndUpdate(shop._id, updateData, { new: true });
+      shop = await Shop.findByIdAndUpdate(shop._id, updateData, {
+        returnDocument: "after",
+      });
     }
     await shop.populate([
       { path: "owner", select: OWNER_FIELDS },
