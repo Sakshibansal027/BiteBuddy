@@ -3,7 +3,7 @@ import Shop from "../models/shop.model.js";
 import Item from "../models/item.model.js";
 export const placeOrder = async (req, res) => {
   try {
-    const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body;
+    const { cartItems, paymentMethod, deliveryAddress } = req.body;
 
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ message: "cart is empty" });
@@ -61,7 +61,7 @@ export const placeOrder = async (req, res) => {
         };
       }),
     );
-
+    const totalAmount = shopOrders.reduce((sum, so) => sum + so.subtotal, 0);
     const newOrder = await Order.create({
       user: req.userId,
       paymentMethod,

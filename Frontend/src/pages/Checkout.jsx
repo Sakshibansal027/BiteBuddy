@@ -71,44 +71,44 @@ function Checkout() {
       getAddressByLatLng(lat, lon);
     } catch (error) { }
   };
- const handlePlaceOrder = async () => {
-  try {
+  const handlePlaceOrder = async () => {
+    try {
 
-    if (!location?.lat || !location?.lon) {
-      alert("Location not selected");
-      return;
-    }
+      if (!location?.lat || !location?.lon) {
+        alert("Location not selected");
+        return;
+      }
 
-    if (!cartItems || cartItems.length === 0) {
-      alert("Cart empty");
-      return;
-    }
+      if (!cartItems || cartItems.length === 0) {
+        alert("Cart empty");
+        return;
+      }
 
-    const result = await axios.post(
-      `${serverUrl}/api/order/place-order`,
-      {
-        paymentMethod,
-        deliveryAddress: {
-          text: addressInput,
-          latitude: location.lat,
-          longitude: location.lon
+      const result = await axios.post(
+        `${serverUrl}/api/order/place-order`,
+        {
+          paymentMethod,
+          deliveryAddress: {
+            text: addressInput,
+            latitude: location.lat,
+            longitude: location.lon
+          },
+          totalAmount,
+          cartItems: cartItems.map(item => ({
+            _id: item.id,        // ✅ important
+            quantity: item.quantity,
+            shop: item.shop
+          }))
         },
-        totalAmount,
-        cartItems: cartItems.map(item => ({
-          _id: item.id,        // ✅ important
-          quantity: item.quantity,
-          shop: item.shop
-        }))
-      },
-      { withCredentials: true }
-    );
-    console.log(result.data);
-    navigate("/order-placed");
-
-  } catch (error) {
-    console.log("ERROR:", error.response?.data || error.message);
-  }
-};
+        { withCredentials: true }
+      );
+      console.log(result.data);
+      navigate("/order-placed");
+    } catch (error) {
+      console.log("ERROR:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Could not place order. Please try again.");
+    }
+  };
   useEffect(() => {
     if (address) {
       setAddressInput(address);

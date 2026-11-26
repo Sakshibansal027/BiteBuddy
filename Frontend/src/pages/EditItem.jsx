@@ -65,6 +65,7 @@ function EditItem() {
       navigate("/");
     } catch (error) {
       console.log(error);
+      alert(error.response?.data?.message || "Could not save changes. Please try again.");
       setLoading(false);
     }
   };
@@ -196,7 +197,7 @@ function EditItem() {
             disabled={loading}
           >
             {loading ? <ClipLoader size={20} color="white" /> : "Save"}
-            
+
           </button>
         </form>
       </div>

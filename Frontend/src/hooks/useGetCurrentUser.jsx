@@ -7,34 +7,27 @@ import serverUrl from "../../config";
 function useGetCurrentUser() {
   const dispatch = useDispatch();
 
-useEffect(() => {
-  const hasToken = document.cookie.includes("token");
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(
+          `${serverUrl}/api/user/current-user`,
+          { withCredentials: true }
+        );
 
-  if (!hasToken) {
-    dispatch(setLoading(false));
-    return; // ❌ API call hi mat karo
-  }
+        dispatch(setUserData(res.data));
 
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(
-        `${serverUrl}/api/user/current-user`,
-        { withCredentials: true }
-      );
+      } catch (error) {
+        console.log("USER ERROR:", error.response?.data);
+        dispatch(setUserData(null));
 
-      dispatch(setUserData(res.data));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
 
-    } catch (error) {
-      console.log("USER ERROR:", error.response?.data);
-      dispatch(setUserData(null));
-
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
-  fetchUser();
-}, []);
+    fetchUser();
+  }, []);
 }
 
 export default useGetCurrentUser;
