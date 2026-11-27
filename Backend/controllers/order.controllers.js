@@ -69,6 +69,11 @@ export const placeOrder = async (req, res) => {
       totalAmount,
       shopOrders,
     });
+    await newOrder.populate(
+      "shopOrders.shopOrderItems.item",
+      "name image price",
+    );
+    await newOrder.populate("shopOrders.shop", "name");
     return res.status(201).json(newOrder);
   } catch (error) {
     console.log("ERROR LINE CHECK:", error.stack);
@@ -94,7 +99,19 @@ export const getMyOrders = async (req, res) => {
         .populate("shopOrders.shop", "name")
         .populate("user", "fullname email mobile")
         .populate("shopOrders.shopOrderItems.item", "name image price");
-      return res.status(200).json(orders);
+
+      const filteredOrders = orders.map((order) => ({
+        _id: order._id,
+        paymentMethod: order.paymentMethod,
+        user: order.user,
+        shopOrders: order.shopOrders.find(
+          (o) => o.owner?.toString() === req.user._id.toString(),
+        ),
+        createdAt: order.createdAt,
+        deliveryAddress: order.deliveryAddress,
+      }));
+
+      return res.status(200).json(filteredOrders);
     }
     return res.status(200).json([]);
   } catch (error) {

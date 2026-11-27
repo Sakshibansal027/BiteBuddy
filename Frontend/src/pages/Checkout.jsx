@@ -15,6 +15,7 @@ import { FaMobileScreen } from "react-icons/fa6";
 import { FaCreditCard } from "react-icons/fa";
 import axios from "axios";
 import serverUrl from "../../config";
+import { addMyOrder } from "../redux/user.slice";
 function Checkout() {
   const apiKey = import.meta.env.VITE_GEOAPIKEY;
   const dispatch = useDispatch();
@@ -102,7 +103,7 @@ function Checkout() {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
+      dispatch(addMyOrder(result.data))
       navigate("/order-placed");
     } catch (error) {
       console.log("ERROR:", error.response?.data || error.message);
