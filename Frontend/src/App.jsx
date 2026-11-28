@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout";
 import OrderPlaced from "./pages/OrderPlaced";
 import MyOrders from "./pages/MyOrders";
 import useGetMyOrders from "./hooks/useGetMyOrder";
+import useUpdateLocation from "./hooks/useUpdateLocation";
 
 function App() {
   useGetCurrentUser();
@@ -26,6 +27,7 @@ function App() {
   useGetShopByCity();
   useGetItemsByCity();
   useGetMyOrders();
+  useUpdateLocation
   const { userData, loading } = useSelector(state => state.user);
 
   if (loading) {

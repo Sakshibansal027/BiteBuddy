@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setLoading } from "../redux/user.slice.js";
+
 import { setMyOrders } from "../redux/user.slice.js";
 import serverUrl from "../../config";
 import { useSelector } from "react-redux";
@@ -20,9 +20,7 @@ function useGetMyOrders() {
                 dispatch(setMyOrders(res.data));
             } catch (error) {
                 dispatch(setMyOrders(null));
-            } finally {
-                dispatch(setLoading(false));
-            }
+            } 
         };
 
         fetchOrder();

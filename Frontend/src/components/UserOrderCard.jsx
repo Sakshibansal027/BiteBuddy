@@ -40,7 +40,7 @@ function UserOrderCard({ data }) {
           key={index}
         >
           <p className='font-semibold text-gray-800 text-sm sm:text-base'>
-            {shopOrder.shop.name}
+            {shopOrder.shop?.name}
           </p>
 
           <div className='flex gap-4 overflow-x-auto pb-2'>
@@ -50,7 +50,7 @@ function UserOrderCard({ data }) {
                 className='flex flex-col shrink-0 w-36 sm:w-40 border border-gray-100 rounded-xl p-2.5 bg-white hover:shadow-sm transition-shadow'
               >
                 <img
-                  src={item.item.image}
+                  src={item.item?.image}
                   alt=""
                   className='w-full h-28 object-cover rounded-lg'
                 />

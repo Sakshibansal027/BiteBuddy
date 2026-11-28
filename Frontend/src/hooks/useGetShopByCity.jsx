@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserData, setLoading, setshopInMyCity } from "../redux/user.slice";
 import serverUrl from "../../config";
 
 function useGetShopByCity() {
   const dispatch = useDispatch();
-    const {currentCity}=useSelector(state=>state.user)
+  const { currentCity } = useSelector(state => state.user)
   useEffect(() => {
     const fetchShop = async () => {
       try {
@@ -17,13 +16,11 @@ function useGetShopByCity() {
         dispatch(setshopInMyCity(res.data));
         console.log(res.data)
       } catch (error) {
-       console.log(error)
-      } finally {
-        dispatch(setLoading(false));
+        console.log(error)
       }
     };
 
-    fetchShop ();
+    fetchShop();
   }, [currentCity]);
 }
 
